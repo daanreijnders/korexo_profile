@@ -1,0 +1,28 @@
+image: python:3.10-rc-buster
+
+test:
+  stage: test
+  script:
+  - apt-get install git
+  - pip install -U sphinx
+  - pip install -r requirements.txt
+  - pip install -e .
+  - sphinx-build -b html docs public
+  only:
+  - branches
+  except:
+  - master
+
+pages:
+  stage: deploy
+  script:
+  - apt-get install git
+  - pip install -U sphinx
+  - pip install -r requirements.txt
+  - pip install -e .
+  - sphinx-build -b html docs public
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
