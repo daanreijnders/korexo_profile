@@ -4,6 +4,11 @@ korexo_profile Python package documentation
 This package contains Python code to load sonde profile CSV files produced
 by the KorEXO sondes.
 
+The source code is stored at `GitLab
+<https://gitlab.com/dew-waterscience/korexo_profile>`_.
+
+Contact Kent Inverarity for access to the GitLab site.
+
 .. contents:: :local:
 
 How to use
@@ -256,3 +261,41 @@ in the repository, so for example you would load it:
 .. code-block::
 
   >>> data = korexo_profile.read("example2_utf8.csv", encoding="utf-8")
+
+Development 
+------------
+
+An issue tracker is located at `GitLab
+<https://gitlab.com/dew-waterscience/korexo_profile>`_.
+
+
+The documentation is accessible on `GitLab
+<https://dew-waterscience.gitlab.io/korexo_profile>`_ when you are signed in.
+
+Contact Kent Inverarity for access to the GitLab site.
+
+To build:
+
+If necessary, create a new version with a git tag per setuptools-scm:
+
+.. code-block::
+
+  $ git log --oneline
+  0ad38e0 (HEAD -> master) update everything
+  13a8644 (tag: v0.2) update
+  ab86ff2 (tag: v0.1) Initial commit
+  $ git tag v0.3
+
+
+Then the usual way with `pyc_wheel <https://pyc-wheel.readthedocs.io/en/stable/>`_:
+
+.. code-block::
+  
+  $ python setup.py bdist_wheel
+  $ python -m pyc_wheel dist\korexo_profile-0.3-py3-none-any.whl
+
+And to publish, the usual:
+
+.. code-block::
+
+  $ twine upload dist\korexo_profile-0.3-py3-none-any.whl
