@@ -1,9 +1,12 @@
+from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 import os
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
+from scipy.interpolate import interp1d
 
 
 def convert_numeric(v):
@@ -105,3 +108,69 @@ def read(fn, encoding="utf-16", parse_dts=True, datefmt="auto"):
     record["datasets"] = datasets
     record["dataframe"] = df
     return record
+
+
+COL_MAPPING = defaultdict(lambda: "NA")
+COL_MAPPING.update({
+    "Date (MM/DD/YYYY)": "date",
+    "Time (HH:mm:ss)": "time",
+    "Time (Fract. Sec)": "time_sec",
+    "Site Name": "site",
+    "Cond µS/cm": "cond",
+    "Depth m": "water_depth",
+    "nLF Cond µS/cm": "cond_nlf",
+    "ODO % sat": "do_sat",
+    "ODO % local": "do_local",
+    "ODO mg/L": "do_conc",
+    "ORP mV": "orp_mv",
+    "Pressure psi a": "press",
+    "Sal psu": "sal_psu",
+    "SpCond µS/cm": "spcond",
+    "TDS mg/L": "tds",
+    "pH": "ph",
+    "pH mV": "ph_mv",
+    "Temp °C": "temp",
+    "Vertical Position m": "vert_pos",
+    "Battery V": "battery",
+    "Cable Pwr V": "cable_power",
+})
+
+def convert_datasets_to_df(datasets, mapping=COL_MAPPING):
+    """Convert a list of datasets to a dataframe, include renaming of
+    column names if desired.
+
+    Args:
+        datasets (list): see output of :func:`korexo_profile.read`.
+        mapping (dict): optional
+
+    Returns: pandas dataframe with "datetime" column added.
+
+    """
+    df = pd.DataFrame({mapping[dset['column']]: dset['data'] for dset in datasets})
+    timestamp = df["date"].astype(str) + " " + df["time"].astype(str)
+    timestamps = pd.to_datetime(timestamp, format="%Y-%m-%d %H:%M:%S")
+    df.insert(0, "datetime", timestamps)
+    return df
+
+
+def make_regularly_spaced(df, index_col="dtw", step=0.05, step_precision=5):
+    index_min = np.round(df[index_col].min(), 0) - 1
+    while index_min < df[index_col].min():
+        index_min += step
+    index_min = np.round(index_min - step, step_precision)
+    
+    index_max = np.round(df[index_col].max(), 0) + 1
+    while index_max > df[index_col].max():
+        index_max -= step
+    index_max = np.round(index_max + step, step_precision)
+
+    index_new = np.linspace(index_min, index_max, int((index_max - index_min) / step) + 1)
+
+    new_df = {}
+    groupby = df.groupby(index_col)
+    for col in df.columns:
+        if is_numeric_dtype(df[col]) and not col == index_col:
+            series = groupby[col].mean()
+            data = interp1d(series.index, series.values, assume_sorted=True, bounds_error=False)(index_new)
+            new_df[col] = data
+    return pd.DataFrame(new_df, index=index_new).rename_axis(index_col)

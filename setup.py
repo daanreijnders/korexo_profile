@@ -18,7 +18,8 @@ setup(
     keywords="science",
     install_requires=(
         "pandas",
-        "numpy"
+        "numpy",
+        "scipy",
     ),
     entry_points={
         # "console_scripts": ["sageodata-db = sageodata_db.app:main"]

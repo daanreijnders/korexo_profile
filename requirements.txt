@@ -2,6 +2,7 @@ setuptools
 setuptools_scm
 pandas
 numpy
+scipy
 
 pytest
 sphinx
