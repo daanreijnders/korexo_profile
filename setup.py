@@ -20,6 +20,7 @@ setup(
         "pandas",
         "numpy",
         "scipy",
+        "lasio",
     ),
     entry_points={
         # "console_scripts": ["sageodata-db = sageodata_db.app:main"]

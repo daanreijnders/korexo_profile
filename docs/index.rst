@@ -33,6 +33,10 @@ This returns a dictionary with three keys:
   >>> data.keys()
   dict_keys(['metadata', 'datasets', 'dataframe'])
 
+Sometimes, people open the raw file in Excel to view or edit it in some small
+way and then save as a CSV. This seems innocuous, but completely changes
+the format (and usually the encoding also - see below). 
+
 Raw pandas dataframe
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
