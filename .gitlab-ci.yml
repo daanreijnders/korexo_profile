@@ -1,28 +1,19 @@
-image: python:3.10-rc-buster
+variables:
+  DOCKER_DRIVER: overlay2
 
-test:
-  stage: test
-  script:
-  - apt-get install git
-  - pip install -U sphinx
-  - pip install -r requirements.txt
-  - pip install -e .
-  - sphinx-build -b html docs public
-  only:
-  - branches
-  except:
-  - master
+image: neerteam/geopandas:latest
 
 pages:
   stage: deploy
   script:
-  - apt-get install git
-  - pip install -U sphinx
-  - pip install -r requirements.txt
-  - pip install -e .
-  - sphinx-build -b html docs public
+    - apt-get update -q -y
+    - apt-get install -y git build-essential
+    - pip install -U sphinx
+    - pip install -r requirements.txt
+    - pip install -e .
+    - sphinx-build -E -a -b html docs public
   artifacts:
     paths:
-    - public
+      - public
   only:
-  - master
+    - main

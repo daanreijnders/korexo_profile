@@ -3,6 +3,7 @@ setuptools_scm
 pandas
 numpy
 scipy
+lasio
 
 pytest
 sphinx
