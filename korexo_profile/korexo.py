@@ -31,10 +31,10 @@ def read(fn, encoding="utf-16", parse_dts=True, datefmt="auto", auto_revert_enco
             format, although note that this isn't always correct. In that case,
             set it here using Python datetime string formats e.g.
             ``"%d/%m/%Y"``
-        auto_revert_encoding (bool): attempt to check whether the file is UTF-16
-            and if it is not i.e. there is no BOM, then use this encoding
-            instead. Set to ``False`` only if you want the code to fail
-            messily if you have the encoding wrong.
+        auto_revert_encoding (str or None/False): attempt to check whether 
+            the file is UTF-16 and if it is not i.e. there is no BOM, then use
+            whatever encoding is set here. Set to ``False`` only if you want the
+            code to attempt *encoding* and fail messily if it is not.
     
     """
     if auto_revert_encoding:

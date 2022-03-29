@@ -257,14 +257,30 @@ But in this case the true date is actually December 11th, which we can force:
 Beware encodings
 --------------------
 
-I believe the sondes use UTF-16-LE by default. Most text editors use UTF-8
-and will convert files to the latter. Note then that ``korexo_profile`` assumes
-UTF-16-LE so you will end up with an error. I have included a UTF-8 example
-in the repository, so for example you would load it:
+I believe the sondes use UTF-16-LE by default. Most text editors do not use
+this, so if someone has opened the file and then saved it, it likely will
+have converted it to UTF-8 or Windows-1252.
+
+The default behaviour is simplest:
 
 .. code-block::
 
-  >>> data = korexo_profile.read("example2_utf8.csv", encoding="utf-8")
+  >>> data = korexo_profile.read("example2.csv")
+
+This is equivalent internally to:
+
+.. code-block::
+
+  >>> data = korexo_profile.read("example2.csv", encoding="utf-16", auto_revert_encoding="cp1252")
+
+Because ``auto_revert_encoding`` is not False, the code will first check
+whether example2.csv is UTF-16. If it is not, then the file will be loaded
+using the value of ``auto_revert_encoding`` (``'cp1252'``). If it is UTF-16,
+it will be loaded as such.
+
+If you want the code to simply use the encoding you direct it to, set
+``auto_revert_encoding=False``. This may result in messy errors and weird
+behaviour.
 
 Skip all that... just give me a complete spreadsheet.
 -----------------------------------------------------
