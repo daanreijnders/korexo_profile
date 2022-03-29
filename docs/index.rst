@@ -348,13 +348,11 @@ If necessary, create a new version with a git tag per setuptools-scm:
   ab86ff2 (tag: v0.1) Initial commit
   $ git tag v0.3
 
-
 Then the usual way with `pyc_wheel <https://pyc-wheel.readthedocs.io/en/stable/>`_:
 
 .. code-block::
   
   $ python setup.py bdist_wheel
-  $ python -m pyc_wheel dist\korexo_profile-0.3-py3-none-any.whl
 
 And to publish, the usual:
 
