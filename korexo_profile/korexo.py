@@ -18,9 +18,11 @@ def convert_numeric(v):
         return pd.to_numeric(v)
 
 
-def read(fn, encoding="utf-16", parse_dts=True, datefmt="auto", auto_revert_encoding="cp1252"):
+def read(
+    fn, encoding="utf-16", parse_dts=True, datefmt="auto", auto_revert_encoding="cp1252"
+):
     """Read KorEXO sonde profile.
-    
+
     Args:
         fn (str): filename
         encoding (str): file encoding. I believe raw KorEXO output is
@@ -31,15 +33,15 @@ def read(fn, encoding="utf-16", parse_dts=True, datefmt="auto", auto_revert_enco
             format, although note that this isn't always correct. In that case,
             set it here using Python datetime string formats e.g.
             ``"%d/%m/%Y"``
-        auto_revert_encoding (str or None/False): attempt to check whether 
+        auto_revert_encoding (str or None/False): attempt to check whether
             the file is UTF-16 and if it is not i.e. there is no BOM, then use
             whatever encoding is set here. Set to ``False`` only if you want the
             code to attempt *encoding* and fail messily if it is not.
-    
+
     """
     if auto_revert_encoding:
         values = open(fn, "rb").read(2)
-        if values != b'\xff\xfe':
+        if values != b"\xff\xfe":
             encoding = auto_revert_encoding
     with open(fn, "rb") as f:
         count = 0
@@ -67,6 +69,7 @@ def read(fn, encoding="utf-16", parse_dts=True, datefmt="auto", auto_revert_enco
             return _read_korexo_format(fn, encoding, parse_dts, datefmt)
         else:
             return _read_korexo_format(fn, encoding, parse_dts, datefmt)
+
 
 def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
     md = {}
@@ -96,7 +99,11 @@ def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
                 md["sensors"] = [sensors[i] for i in indices]
                 md["means"] = [means[i] for i in indices]
                 md["stdevs"] = [stdevs[i] for i in indices]
-    df = pd.read_csv(fn, skiprows=(md["header_line_no"] - 1), encoding=encoding, )
+    df = pd.read_csv(
+        fn,
+        skiprows=(md["header_line_no"] - 1),
+        encoding=encoding,
+    )
     record = {}
     datasets = []
     # print(f"md = \n" + pformat(md))
@@ -139,7 +146,12 @@ def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
                         elif unitfmt == "DD/MM/YYYY":
                             datefmt = "%d/%m/%Y"
                     try:
-                        data = [ts.date() for ts in pd.to_datetime(data, format=datefmt, errors="coerce")]
+                        data = [
+                            ts.date()
+                            for ts in pd.to_datetime(
+                                data, format=datefmt, errors="coerce"
+                            )
+                        ]
                     except:
                         pass
             if len(np.unique(data)) == 1:
@@ -166,29 +178,32 @@ def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
 
 
 COL_MAPPING = defaultdict(lambda: "NA")
-COL_MAPPING.update({
-    "Date (MM/DD/YYYY)": "date",
-    "Time (HH:mm:ss)": "time",
-    "Time (Fract. Sec)": "time_sec",
-    "Site Name": "site",
-    "Cond µS/cm": "cond",
-    "Depth m": "water_depth",
-    "nLF Cond µS/cm": "cond_nlf",
-    "ODO % sat": "do_sat",
-    "ODO % local": "do_local",
-    "ODO mg/L": "do_conc",
-    "ORP mV": "orp_mv",
-    "Pressure psi a": "press",
-    "Sal psu": "sal_psu",
-    "SpCond µS/cm": "spcond",
-    "TDS mg/L": "tds",
-    "pH": "ph",
-    "pH mV": "ph_mv",
-    "Temp °C": "temp",
-    "Vertical Position m": "vert_pos",
-    "Battery V": "battery",
-    "Cable Pwr V": "cable_power",
-})
+COL_MAPPING.update(
+    {
+        "Date (MM/DD/YYYY)": "date",
+        "Time (HH:mm:ss)": "time",
+        "Time (Fract. Sec)": "time_sec",
+        "Site Name": "site",
+        "Cond µS/cm": "cond",
+        "Depth m": "water_depth",
+        "nLF Cond µS/cm": "cond_nlf",
+        "ODO % sat": "do_sat",
+        "ODO % local": "do_local",
+        "ODO mg/L": "do_conc",
+        "ORP mV": "orp_mv",
+        "Pressure psi a": "press",
+        "Sal psu": "sal_psu",
+        "SpCond µS/cm": "spcond",
+        "TDS mg/L": "tds",
+        "pH": "ph",
+        "pH mV": "ph_mv",
+        "Temp °C": "temp",
+        "Vertical Position m": "vert_pos",
+        "Battery V": "battery",
+        "Cable Pwr V": "cable_power",
+    }
+)
+
 
 def convert_datasets_to_df(datasets, mapping=COL_MAPPING):
     """Convert a list of datasets to a dataframe, include renaming of
@@ -201,7 +216,7 @@ def convert_datasets_to_df(datasets, mapping=COL_MAPPING):
     Returns: pandas dataframe with "datetime" column added.
 
     """
-    df = pd.DataFrame({mapping[dset['column']]: dset['data'] for dset in datasets})
+    df = pd.DataFrame({mapping[dset["column"]]: dset["data"] for dset in datasets})
     timestamp = df["date"].astype(str) + " " + df["time"].astype(str)
     timestamps = pd.to_datetime(timestamp, format="%Y-%m-%d %H:%M:%S")
     df.insert(0, "datetime", timestamps)
@@ -220,8 +235,8 @@ def make_regularly_spaced(df, index_col="dtw", step=0.05, step_precision=5):
         step_precision (int)
 
     Returns:
-        pandas DataFrame where the newly created *index_col* values are set 
-        as the dataframe index. All other columns of *df* are included 
+        pandas DataFrame where the newly created *index_col* values are set
+        as the dataframe index. All other columns of *df* are included
         as columns of the *df*, interpolated at the new *index_col* values.
 
     """
@@ -229,27 +244,40 @@ def make_regularly_spaced(df, index_col="dtw", step=0.05, step_precision=5):
     while index_min < df[index_col].min():
         index_min += step
     index_min = np.round(index_min - step, step_precision)
-    
+
     index_max = np.round(df[index_col].max(), 0) + 1
     while index_max > df[index_col].max():
         index_max -= step
     index_max = np.round(index_max + step, step_precision)
 
-    index_new = np.linspace(index_min, index_max, int((index_max - index_min) / step) + 1)
+    index_new = np.linspace(
+        index_min, index_max, int((index_max - index_min) / step) + 1
+    )
 
     new_df = {}
     groupby = df.groupby(index_col)
     for col in df.columns:
         if is_numeric_dtype(df[col]) and not col == index_col:
             series = groupby[col].mean()
-            data = interp1d(series.index, series.values, assume_sorted=True, bounds_error=False)(index_new)
+            data = interp1d(
+                series.index, series.values, assume_sorted=True, bounds_error=False
+            )(index_new)
             new_df[col] = data
     return pd.DataFrame(new_df, index=index_new).rename_axis(index_col)
 
 
-def to_las(df, fn, encoding='utf-16', col_metadata=None, well_metadata=None, param_metadata=None, add_mtime_date="DATE", auto_revert_encoding="cp1252"):
+def to_las(
+    df,
+    fn,
+    encoding="utf-16",
+    col_metadata=None,
+    well_metadata=None,
+    param_metadata=None,
+    add_mtime_date="DATE",
+    auto_revert_encoding="cp1252",
+):
     """Convert a KorEXO profile file to Log ASCII Standard (LAS).
-    
+
     Args:
         df (pandas DataFrame): a regularly-spaced output from
             reading a KorEXO profile CSV file.
@@ -259,35 +287,35 @@ def to_las(df, fn, encoding='utf-16', col_metadata=None, well_metadata=None, par
             The first item of the tuple is a string for the unit
             e.g. ``"m"``, and the second item is the description.
         well_metadata (dict): dict of metadata to add to the LAS
-            file's ~Well section.            
+            file's ~Well section.
         param_metadata (dict): dict of metadata to add to the LAS
             file's ~Param section
-        add_mtime_date (str): add the file modified time of *fn* 
+        add_mtime_date (str): add the file modified time of *fn*
             as a value in the ~Well section. Set to False or None
             to prevent adding it at all.
         auto_revert_encoding (bool): attempt to check whether the file is UTF-16
             and if it is not i.e. there is no BOM, then use this encoding
             instead. Set to ``False`` only if you want the code to fail
             messily if you have the encoding wrong.
-    
-    The contents of the original KorEXO profile CSV file will be 
+
+    The contents of the original KorEXO profile CSV file will be
     recorded in the LAS file's ~Other block.
-    
+
     Example:
-    
+
     .. code-block::
-    
+
         >>> import korexo_profile
         >>> data = korexo_profile.read(fn, datefmt="%d/%m/%Y")
         >>> df = korexo_profile.convert_datasets_to_df(data["datasets"])
         >>> df["water_depth"] += WELL_DEPTH_TO_WATER_MEASUREMENT
         >>> df2 = korexo_profile.make_regularly_spaced(df, "water_depth", step=0.05)
         >>> las = korexo_profile.to_las(df2, fn)
-        
+
     """
     if auto_revert_encoding:
         values = open(fn, "rb").read(2)
-        if values != b'\xff\xfe':
+        if values != b"\xff\xfe":
             encoding = auto_revert_encoding
 
     if col_metadata is None:
@@ -296,20 +324,22 @@ def to_las(df, fn, encoding='utf-16', col_metadata=None, well_metadata=None, par
         well_metadata = {}
     if param_metadata is None:
         param_metadata = {}
-        
+
     las = lasio.LASFile()
-    las.set_data_from_df(df, )
+    las.set_data_from_df(
+        df,
+    )
     for curve in las.curves:
         if curve.mnemonic in col_metadata.keys():
             unit, descr = col_metadata[curve.mnemonic]
             curve.unit = unit
             curve.descr = descr
-    
+
     p = Path(fn)
     stat = p.stat()
-    
+
     from datetime import datetime as dt_class
-    
+
     ctime = pd.Timestamp(dt_class.fromtimestamp(stat.st_ctime))
     mtime = pd.Timestamp(dt_class.fromtimestamp(stat.st_mtime))
     other = f"Filename: {p.absolute()}"
@@ -319,7 +349,7 @@ def to_las(df, fn, encoding='utf-16', col_metadata=None, well_metadata=None, par
     with open(fn, "rb") as f:
         other += f.read().decode(encoding)
     las.other = other
-    
+
     for key, value in well_metadata.items():
         if "DATE" in las.well:
             del las.well["DATE"]
@@ -328,14 +358,16 @@ def to_las(df, fn, encoding='utf-16', col_metadata=None, well_metadata=None, par
             las.well.append(lasio.HeaderItem(key, value=value))
         else:
             las.well[key] = value
-    
+
     for key, value in param_metadata.items():
         if not key in las.params:
             las.params.append(lasio.HeaderItem(key, value=value))
         else:
             las.params[key] = value
-    
+
     if add_mtime_date:
-        las.well.append(lasio.HeaderItem(add_mtime_date, value=mtime.strftime("%Y-%m-%d")))
-    
+        las.well.append(
+            lasio.HeaderItem(add_mtime_date, value=mtime.strftime("%Y-%m-%d"))
+        )
+
     return las

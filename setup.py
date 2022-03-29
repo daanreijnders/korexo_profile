@@ -12,9 +12,7 @@ setup(
     author="DEW Water Science (Kent Inverarity)",
     author_email="kent.inverarity@sa.gov.au",
     license="All rights reserved",
-    classifiers=(
-        "Programming Language :: Python :: 3",
-    ),
+    classifiers=("Programming Language :: Python :: 3",),
     keywords="science",
     install_requires=(
         "pandas",
@@ -22,7 +20,5 @@ setup(
         "scipy",
         "lasio",
     ),
-    entry_points={
-        # "console_scripts": ["sageodata-db = sageodata_db.app:main"]
-    },
+    entry_points={},
 )
