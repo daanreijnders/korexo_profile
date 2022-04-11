@@ -145,6 +145,19 @@ def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
                             datefmt = "%m/%d/%Y"
                         elif unitfmt == "DD/MM/YYYY":
                             datefmt = "%d/%m/%Y"
+                        if len(data) > 0:
+                            parts = data[0].split("/")
+                            first = parts[0]
+                            second = parts[1]
+                            if unitfmt == "MM/DD/YYYY" and int(first) > 12:
+                                datefmt = "%d/%m/%Y"
+                            elif unitfmt == "DD/MM/YYYY" and int(second) > 12:
+                                datefmt = "%m/%d/%Y"
+                            elif int(first) <= 12 and int(second) <= 12:
+                                if unitfmt == "MM/DD/YYYY" and second.startswith("0"):
+                                    datefmt = "%d/%m/%Y"
+                            else:
+                                pass
                     try:
                         data = [
                             ts.date()
@@ -178,9 +191,11 @@ def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
 
 
 COL_MAPPING = defaultdict(lambda: "NA")
+COL_MAPPING = {}
 COL_MAPPING.update(
     {
         "Date (MM/DD/YYYY)": "date",
+        "Date (DD/MM/YYYY)": "date",
         "Time (HH:mm:ss)": "time",
         "Time (Fract. Sec)": "time_sec",
         "Site Name": "site",
@@ -216,6 +231,13 @@ def convert_datasets_to_df(datasets, mapping=COL_MAPPING):
     Returns: pandas dataframe with "datetime" column added.
 
     """
+    ##### TODO FIX THIS SO THAT ANY COLUMNS CAN SURVIVE THE MAPPING
+    mapping = dict(mapping) # make a copy
+    missing_from_mapping = []
+    for dset in datasets:
+        if not dset['column'] in mapping:
+            mapping[dset['column']] = dset['column']
+            
     df = pd.DataFrame({mapping[dset["column"]]: dset["data"] for dset in datasets})
     timestamp = df["date"].astype(str) + " " + df["time"].astype(str)
     timestamps = pd.to_datetime(timestamp, format="%Y-%m-%d %H:%M:%S")
