@@ -38,6 +38,10 @@ def read(
             whatever encoding is set here. Set to ``False`` only if you want the
             code to attempt *encoding* and fail messily if it is not.
 
+    Returns:
+        dict: with keys 'metadata', 'dataframe' and 'datasets'. See
+        package documentation for more details.
+
     """
     if auto_revert_encoding:
         values = open(fn, "rb").read(2)
@@ -226,9 +230,11 @@ def convert_datasets_to_df(datasets, mapping=COL_MAPPING):
 
     Args:
         datasets (list): see output of :func:`korexo_profile.read`.
-        mapping (dict): optional
+        mapping (dict): optional. The default mapping is stored
+            in korexo_profile.COL_MAPPING
 
-    Returns: pandas dataframe with "datetime" column added.
+    Returns: 
+        pandas.DataFrame: dataframe with "datetime" column added.
 
     """
     ##### TODO FIX THIS SO THAT ANY COLUMNS CAN SURVIVE THE MAPPING
@@ -257,7 +263,7 @@ def make_regularly_spaced(df, index_col="dtw", step=0.05, step_precision=5):
         step_precision (int)
 
     Returns:
-        pandas DataFrame where the newly created *index_col* values are set
+        pandas.DataFrame: dataframe, where the newly created *index_col* values are set
         as the dataframe index. All other columns of *df* are included
         as columns of the *df*, interpolated at the new *index_col* values.
 
@@ -319,6 +325,9 @@ def to_las(
             and if it is not i.e. there is no BOM, then use this encoding
             instead. Set to ``False`` only if you want the code to fail
             messily if you have the encoding wrong.
+
+    Returns:
+        lasio.LASFile object
 
     The contents of the original KorEXO profile CSV file will be
     recorded in the LAS file's ~Other block.

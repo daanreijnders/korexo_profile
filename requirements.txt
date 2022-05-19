@@ -8,3 +8,4 @@ lasio
 pytest
 sphinx
 sphinx_rtd_theme
+nbsphinx
