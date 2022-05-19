@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name="korexo_profile",
     packages=["korexo_profile"],
-    use_scm_version=True,
+    use_scm_version={'version_scheme': 'post-release'},
     setup_requires=["setuptools_scm"],
     description="Read KorEXO sonde profile CSV files",
     long_description=open("README.md", mode="r").read(),
