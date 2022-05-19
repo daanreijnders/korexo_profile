@@ -28,7 +28,7 @@ def test_example2_utf8():
 
 def test_example2_utf8_encoding_fail_check():
     with pytest.raises(UnicodeDecodeError):
-        data = korexo_profile.read(cwd / "example2_utf8.csv")
+        data = korexo_profile.read(cwd / "example2_utf8.csv", auto_revert_encoding=False)
 
 
 def test_datefmt_auto():
