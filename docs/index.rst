@@ -4,7 +4,7 @@ korexo_profile Python package documentation
 Python code to load sonde profile CSV files produced
 by the KorEXO sondes.
 
-The source code is stored at `GitHub
+Source code is hosted on `GitHub
 <https://github.com/dew-waterscience/korexo_profile>`_.
 
 
