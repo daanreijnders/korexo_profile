@@ -157,9 +157,6 @@ def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
                                 datefmt = "%d/%m/%Y"
                             elif unitfmt == "DD/MM/YYYY" and int(second) > 12:
                                 datefmt = "%m/%d/%Y"
-                            # elif int(first) <= 12 and int(second) <= 12:
-                            #     if unitfmt == "MM/DD/YYYY" and second.startswith("0"):
-                            #         datefmt = "%d/%m/%Y"
                             else:
                                 pass
                     try:
@@ -339,7 +336,7 @@ def to_las(
         >>> import korexo_profile
         >>> data = korexo_profile.read(fn, datefmt="%d/%m/%Y")
         >>> df = korexo_profile.convert_datasets_to_df(data["datasets"])
-        >>> df["water_depth"] += WELL_DEPTH_TO_WATER_MEASUREMENT
+        >>> df["depth"] = df["vert_pos"] + 0.27 + WELL_DEPTH_TO_WATER_MEASUREMENT
         >>> df2 = korexo_profile.make_regularly_spaced(df, "water_depth", step=0.05)
         >>> las = korexo_profile.to_las(df2, fn)
 
