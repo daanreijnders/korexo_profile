@@ -94,7 +94,7 @@ def _read_korexo_format(fn, encoding, parse_dts=True, datefmt="auto"):
             elif "SENSOR SERIAL NUMBER:" in line:
                 sensor_line = line.split(",")
                 sensors = sensor_line[p_offset:]
-            elif line.startswith("Date ("):
+            elif line.startswith("Date (") or "DATE (MM/DD/YYYY)" in line or "DATE (DD/MM/YYYY)" in line:
                 md["header_line_no"] = i + 1
                 params_ = line.split(",")
                 params = params_[p_offset:]
